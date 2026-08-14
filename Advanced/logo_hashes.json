@@ -1,0 +1,62 @@
+{
+  "phash_bits": 64,
+  "threshold": 12,
+  "logos": [
+    {
+      "brand": "google",
+      "hashes": [
+        "8965769889377475",
+        "c812af1f3ae55570"
+      ]
+    },
+    {
+      "brand": "paypal",
+      "hashes": [
+        "b164cf9accc31c6c",
+        "c60da5f27a2f8d44"
+      ]
+    },
+    {
+      "brand": "amazon",
+      "hashes": [
+        "85357aca85357aca"
+      ]
+    },
+    {
+      "brand": "netflix",
+      "hashes": []
+    },
+    {
+      "brand": "primevideo",
+      "hashes": []
+    },
+    {
+      "brand": "boat",
+      "hashes": [
+        "b3c3cd19d06d9a31"
+      ]
+    },
+    {
+      "brand": "myntra",
+      "hashes": [
+        "eeec91126eac2ea8"
+      ]
+    },
+    {
+      "brand": "apple",
+      "hashes": []
+    },
+    {
+      "brand": "facebook",
+      "hashes": []
+    },
+    {
+      "brand": "instagram",
+      "hashes": []
+    },
+    {
+      "brand": "linkedin",
+      "hashes": []
+    }
+  ]
+}

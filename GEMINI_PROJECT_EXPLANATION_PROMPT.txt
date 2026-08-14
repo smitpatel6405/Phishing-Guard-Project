@@ -1,0 +1,237 @@
+You are an expert cybersecurity and full-stack development mentor. I need your help understanding and improving my project. Please provide clear, actionable answers with code examples when needed.
+
+===========================================
+PROJECT: PHISHGUARD - Real-Time Phishing Detection System
+===========================================
+
+PROJECT OVERVIEW
+----------------
+PhishGuard is a real-time phishing detection system that protects users while they browse the web. It consists of two main components:
+1. Flask Backend API (Python) - Analyzes URLs using machine learning
+2. Chrome Browser Extension (JavaScript) - Captures URLs and displays warnings to users
+
+When a user visits any webpage, the extension automatically sends the URL to the backend API, which analyzes it and returns a prediction (PHISHING or LEGITIMATE) with a confidence score. The extension then displays color-coded warnings (Red/Yellow/Green) to alert the user.
+
+ARCHITECTURE & HOW IT WORKS
+----------------------------
+1. User visits a webpage → Chrome Extension captures the URL
+2. Extension sends URL to Flask backend API (POST request to /predict endpoint)
+3. Backend extracts 9 URL features and runs ML model (RandomForest classifier)
+4. Backend applies multi-layer security checks:
+   - Layer 1: Allowlist/Denylist check (instant verdict for known domains)
+   - Layer 2: ML prediction (RandomForest model)
+   - Layer 3: Content heuristics (iframe count, external scripts, etc.)
+   - Layer 4: Optional reputation API (Google Safe Browsing)
+5. Backend returns JSON response with prediction, confidence, and features
+6. Extension displays result in popup with color coding and detailed info
+
+TECHNOLOGY STACK
+----------------
+Backend:
+- Python 3.8+
+- Flask 2.3.3 (web framework)
+- Flask-CORS 4.0.0 (handles cross-origin requests)
+- scikit-learn 1.3.0 (machine learning)
+- pandas 2.0.3 (data processing)
+- requests 2.32.4 (HTTP client)
+- Pillow 10.3.0 & ImageHash 4.3.1 (image processing for advanced features)
+- gunicorn 21.2.0 (production server)
+
+Frontend:
+- Chrome Extension (Manifest V3)
+- JavaScript (ES6+)
+- HTML5 + CSS3
+- Chrome Extension APIs
+
+PROJECT FILE STRUCTURE
+----------------------
+HACKATHON/
+├── app.py                    # Flask backend API (main application)
+├── requirements.txt          # Python dependencies
+├── Dockerfile               # Docker configuration
+├── manifest.json            # Chrome extension manifest
+├── background.js            # Extension background script (handles API calls)
+├── content.js               # Content script (captures page data)
+├── popup.html               # Extension popup UI
+├── popup.js                 # Popup functionality
+├── models/                  # ML models directory
+│   └── phishing_model.pkl   # Trained RandomForest model
+└── icons/                   # Extension icons
+
+BACKEND API ENDPOINTS
+---------------------
+1. GET / → API information
+2. GET /health → Health check endpoint (returns {"status": "healthy"})
+3. POST /predict → Main phishing detection endpoint
+   - Input: {"url": "https://example.com", "page_signals": {...}, "visual_signals": {...}}
+   - Output: {
+       "prediction": "PHISHING" or "LEGITIMATE",
+       "confidence": 0.85,
+       "features": {...},
+       "url": "https://example.com"
+     }
+
+4. POST /predict_fused → Advanced visual analysis endpoint (uses screenshots)
+
+MACHINE LEARNING MODEL
+----------------------
+- Algorithm: RandomForest Classifier
+- Features: 9 URL-based features
+- Model File: models/phishing_model.pkl (pickle format)
+- Training: Uses scikit-learn
+- Output: Binary classification (phishing/legitimate) with confidence score
+
+FEATURE ENGINEERING (9 Features)
+--------------------------------
+The system extracts these 9 features from any URL:
+1. url_length - Total character count of the URL
+2. number_of_dots - Count of dot characters (.)
+3. has_https - Boolean (1 if HTTPS, 0 if HTTP)
+4. has_ip_address - Boolean (1 if URL contains IP address)
+5. has_www - Boolean (1 if URL has www subdomain)
+6. has_subdomain - Boolean (1 if URL has additional subdomains)
+7. domain_length - Length of the domain name
+8. path_length - Length of the URL path
+9. has_suspicious_words - Boolean (1 if URL contains suspicious keywords like "secure", "login", etc.)
+
+MULTI-LAYER SECURITY ARCHITECTURE
+---------------------------------
+Layer 1: Allowlist/Denylist
+- Instant verdict for known domains
+- ALLOWLISTED_DOMAINS: google.com, paypal.com, microsoft.com, etc.
+- DENYLISTED_DOMAINS: Known phishing domains
+- Confidence: 99% (instant bypass)
+
+Layer 2: Machine Learning
+- RandomForest classifier on 9 URL features
+- Confidence threshold: 80% (configurable via PG_PHISHING_THRESHOLD env var)
+- Performance: <100ms
+
+Layer 3: Content Heuristics
+- Analyzes page content (iframes, external scripts, brand mismatches)
+- Checks for suspicious patterns
+- Confidence: 85%
+
+Layer 4: Reputation API (Optional)
+- Google Safe Browsing API integration
+- Requires GSB_API_KEY environment variable
+- Confidence: 95%
+- Timeout: 4 seconds
+
+CHROME EXTENSION COMPONENTS
+---------------------------
+1. manifest.json - Extension configuration (permissions, scripts, icons)
+2. background.js - Background service worker
+   - Handles API communication with Flask backend
+   - Caches results (5-minute cache duration)
+   - Monitors backend health every 5 minutes
+   - Listens for tab updates and triggers analysis
+   - Handles visual scan requests (screenshot capture)
+
+3. content.js - Content script injected into web pages
+   - Captures current page URL
+   - Extracts page signals (title, meta tags, iframe count, scripts, etc.)
+   - Extracts visual signals (favicon URL, etc.)
+   - Sends data to background script
+
+4. popup.html/popup.js - Extension popup UI
+   - Displays current page analysis result
+   - Shows color-coded status (Red/Yellow/Green)
+   - Displays confidence score and extracted features
+   - Shows backend connection status
+   - Provides "Run Visual Scan" button for advanced analysis
+
+CONFIGURATION & ENVIRONMENT VARIABLES
+-------------------------------------
+- PG_ALLOWLIST: Comma-separated list of additional allowed domains
+- PG_DENYLIST: Comma-separated list of blocked domains
+- PG_PHISHING_THRESHOLD: ML confidence threshold (default: 0.80)
+- GSB_API_KEY or GOOGLE_SAFE_BROWSING_API_KEY: Google Safe Browsing API key (optional)
+
+BACKEND DEFAULT CONFIGURATION
+------------------------------
+- Flask runs on http://localhost:5000 (main API)
+- Advanced visual API runs on http://localhost:5001 (if available)
+- CORS enabled for all origins (allows extension to communicate)
+- Model loaded from models/phishing_model.pkl on startup
+
+EXTENSION DEFAULT CONFIGURATION
+-------------------------------
+- API_BASE_URL_PREDICT: http://localhost:5000
+- API_BASE_URL_VISUAL: http://localhost:5001
+- Cache duration: 5 minutes
+- Health check interval: 5 minutes
+
+KEY FEATURES
+------------
+1. Real-time Analysis: Automatically analyzes every webpage visit
+2. Visual Warnings: Color-coded alerts (Red=Phishing, Yellow=Suspicious, Green=Safe)
+3. Confidence Scores: Shows prediction confidence percentage
+4. Feature Transparency: Displays all 9 extracted features
+5. Caching: Reduces API calls by caching results for 5 minutes
+6. Health Monitoring: Checks backend connectivity automatically
+7. Visual Scan: Advanced screenshot-based analysis (optional)
+8. Multi-layer Detection: Combines ML, heuristics, and reputation checks
+
+WORKFLOW EXAMPLE
+----------------
+1. User navigates to "https://example-suspicious-site.com"
+2. Chrome extension (content.js) captures URL and page signals
+3. Background script (background.js) checks cache → not found
+4. Background script sends POST request to http://localhost:5000/predict
+5. Flask backend (app.py) receives request:
+   - Extracts 9 URL features
+   - Checks allowlist/denylist → not found
+   - Runs RandomForest model → prediction: PHISHING, confidence: 0.87
+   - Applies heuristics → confirms suspicious
+   - Returns JSON response
+6. Extension receives response, caches it, displays red warning in popup
+7. User sees: "⚠️ PHISHING DETECTED - 87% confidence"
+
+PERFORMANCE METRICS
+-------------------
+- Model inference time: <100ms
+- API response time: <200ms (local)
+- Extension load time: <1 second
+- Memory usage: <50MB
+- Cache hit rate: Improves with repeated visits
+
+TESTING
+-------
+- Backend: Test with curl or Postman
+  Example: curl -X POST http://localhost:5000/predict -H "Content-Type: application/json" -d '{"url": "https://google.com"}'
+- Extension: Install via chrome://extensions (Developer mode → Load unpacked)
+- Health check: curl http://localhost:5000/health
+
+TROUBLESHOOTING COMMON ISSUES
+------------------------------
+1. CORS errors: Backend has CORS enabled, but check browser console
+2. Backend offline: Ensure Flask server is running on port 5000
+3. Extension not loading: Check manifest.json syntax
+4. Model not found: Verify models/phishing_model.pkl exists
+5. API timeout: Check network connectivity and backend logs
+
+FUTURE ENHANCEMENTS (Planned)
+------------------------------
+- Database integration for analysis history
+- User authentication and personalized settings
+- Advanced ML models (deep learning)
+- Real-time model updates
+- Mobile support (Android/iOS)
+- API rate limiting for production
+- Multi-browser support (Firefox, Edge, Safari)
+
+===========================================
+YOUR ROLE AS MENTOR
+===========================================
+When I ask questions about this project, please:
+1. Use the context above to understand the project architecture
+2. Provide specific code examples referencing the actual files (app.py, background.js, etc.)
+3. Explain how changes affect the overall system
+4. Suggest best practices for security, performance, and code quality
+5. Help debug issues by understanding the full workflow
+6. Provide step-by-step solutions with file paths and code snippets
+
+I'm ready to ask questions about implementing features, fixing bugs, optimizing performance, or improving the ML model. Please respond with clear, actionable guidance.
+
+

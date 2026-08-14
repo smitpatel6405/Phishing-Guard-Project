@@ -1,0 +1,62 @@
+[
+  {
+    "brand": "google",
+    "domain": "www.google.com",
+    "url": "https://www.google.com",
+    "path": "Advanced\\brand_pages\\google\\index.html"
+  },
+  {
+    "brand": "paypal",
+    "domain": "www.paypal.com",
+    "url": "https://www.paypal.com",
+    "path": "Advanced\\brand_pages\\paypal\\index.html"
+  },
+  {
+    "brand": "amazon",
+    "domain": "www.amazon.com",
+    "url": "https://www.amazon.com",
+    "path": "Advanced\\brand_pages\\amazon\\index.html"
+  },
+  {
+    "brand": "apple",
+    "domain": "www.apple.com",
+    "url": "https://www.apple.com",
+    "path": "Advanced\\brand_pages\\apple\\index.html"
+  },
+  {
+    "brand": "facebook",
+    "domain": "www.facebook.com",
+    "url": "https://www.facebook.com",
+    "path": "Advanced\\brand_pages\\facebook\\index.html"
+  },
+  {
+    "brand": "instagram",
+    "domain": "www.instagram.com",
+    "url": "https://www.instagram.com",
+    "path": "Advanced\\brand_pages\\instagram\\index.html"
+  },
+  {
+    "brand": "linkedin",
+    "domain": "www.linkedin.com",
+    "url": "https://www.linkedin.com",
+    "path": "Advanced\\brand_pages\\linkedin\\index.html"
+  },
+  {
+    "brand": "netflix",
+    "domain": "www.netflix.com",
+    "url": "https://www.netflix.com",
+    "path": "Advanced\\brand_pages\\netflix\\index.html"
+  },
+  {
+    "brand": "myntra",
+    "domain": "www.myntra.com",
+    "url": "https://www.myntra.com",
+    "path": "Advanced\\brand_pages\\myntra\\index.html"
+  },
+  {
+    "brand": "boat",
+    "domain": "www.boat-lifestyle.com",
+    "url": "https://www.boat-lifestyle.com",
+    "path": "Advanced\\brand_pages\\boat\\index.html"
+  }
+]

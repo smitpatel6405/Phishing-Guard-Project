@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PhishGuard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            width: 350px;
+            min-height: 400px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .header {
+            text-align: center;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+        }
+        
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .subtitle {
+            font-size: 12px;
+            opacity: 0.8;
+        }
+        
+        .status-section {
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        
+        .status-online {
+            background-color: #2ecc71;
+            box-shadow: 0 0 10px rgba(46, 204, 113, 0.5);
+        }
+        
+        .status-offline {
+            background-color: #e74c3c;
+            box-shadow: 0 0 10px rgba(231, 76, 60, 0.5);
+        }
+        
+        .current-url {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            margin: 0 20px 20px;
+            border-radius: 8px;
+            word-break: break-all;
+            font-size: 12px;
+            line-height: 1.4;
+        }
+        
+        .analysis-result {
+            margin: 0 20px 20px;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        
+        .result-phishing {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+        }
+        
+        .result-safe {
+            background: linear-gradient(135deg, #2ecc71, #27ae60);
+        }
+        
+        .result-unknown {
+            background: linear-gradient(135deg, #95a5a6, #7f8c8d);
+        }
+        
+        .result-icon {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+        
+        .result-text {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .confidence {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        
+        .actions {
+            padding: 0 20px 20px;
+        }
+        
+        .btn {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 6px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 10px;
+        }
+        
+        .btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #2980b9, #1f5f8b);
+        }
+        
+        .features {
+            margin: 0 20px 20px;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 12px;
+        }
+        
+        .feature-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+            padding: 3px 0;
+        }
+        
+        .feature-label {
+            opacity: 0.8;
+        }
+        
+        .feature-value {
+            font-weight: bold;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px 20px;
+        }
+        
+        .spinner {
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-top: 3px solid white;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .error {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            color: white;
+            padding: 15px;
+            margin: 0 20px 20px;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="logo">🛡️ PhishGuard</div>
+        <div class="subtitle">Real-time Phishing Detection</div>
+    </div>
+    
+    <div class="status-section">
+        <span class="status-indicator" id="statusIndicator"></span>
+        <span id="statusText">Checking backend...</span>
+    </div>
+    
+    <div class="current-url" id="currentUrl">
+        <strong>Current URL:</strong><br>
+        <span id="urlText">Loading...</span>
+    </div>
+    
+    <div class="analysis-result" id="analysisResult" style="display: none;">
+        <div class="result-icon" id="resultIcon"></div>
+        <div class="result-text" id="resultText"></div>
+        <div class="confidence" id="confidence"></div>
+    </div>
+    
+    <div class="features" id="decision" style="display: none;">
+        <h4 style="margin-bottom: 10px; text-align: center;">Decision Details</h4>
+        <div class="feature-item">
+            <span class="feature-label">Reason</span>
+            <span class="feature-value" id="reasonValue">-</span>
+        </div>
+        <div class="feature-item">
+            <span class="feature-label">Threshold</span>
+            <span class="feature-value" id="thresholdValue">-</span>
+        </div>
+        <div class="feature-item">
+            <span class="feature-label">Allowlisted</span>
+            <span class="feature-value" id="allowlistedValue">-</span>
+        </div>
+        <div class="feature-item" style="align-items: start;">
+            <span class="feature-label">Content Flags</span>
+            <span class="feature-value" id="contentFlagsValue" style="text-align: right; white-space: pre-wrap; max-width: 180px;">-</span>
+        </div>
+    </div>
+
+    <div class="features" id="whySection" style="display: none;">
+        <h4 style="margin-bottom: 10px; text-align: center;">Why this decision?</h4>
+        <div id="reasonsList"></div>
+    </div>
+    
+    <div class="features" id="features" style="display: none;">
+        <h4 style="margin-bottom: 10px; text-align: center;">URL Features</h4>
+        <div id="featuresList"></div>
+    </div>
+    
+    <div class="loading" id="loading">
+        <div class="spinner"></div>
+        <div>Analyzing current page...</div>
+    </div>
+    
+    <div class="actions">
+        <button class="btn btn-primary" id="analyzeBtn">Analyze Current Page</button>
+        <button class="btn" id="refreshBtn">Refresh Analysis</button>
+        <label style="display:block; margin-bottom:8px; font-size:12px;">
+            <input type="checkbox" id="visualConsent" /> Allow screenshot for visual scan
+        </label>
+        <button class="btn" id="visualScanBtn">Run Visual Scan (screenshot)</button>
+    </div>
+    
+    <script src="popup.js"></script>
+</body>
+</html> 
